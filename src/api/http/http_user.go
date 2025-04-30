@@ -9,13 +9,13 @@ import (
 	"strings"
 )
 
-type UserHandler interface {
-	GetById(ctx *gin.Context)
+type VideoHandler interface {
+	GetByTitle(ctx *gin.Context)
 	Create(ctx *gin.Context)
 }
 
-type userHandler struct {
-	userService service.UserService
+type videoHandler struct {
+	videoService service.VideoService
 }
 
 func (userHandler userHandler) GetById(ctx *gin.Context) {
