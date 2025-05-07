@@ -93,8 +93,8 @@ func NewInternalServerError(message string, err error) *RestErr {
 
 
 const (
-	queryGetUserById string = "SELECT id, first_name, last_name, full_name, age, email FROM users WHERE id = ?"
-	queryCreateUser  string = "INSERT INTO users (id, first_name, last_name, full_name, age, email) VALUES (?, ?, ?, ?, ?, ?)"
+	GetUserByIdQuery string = "SELECT id, first_name, last_name, full_name, age, email FROM users WHERE id = ?"
+	CreateUserQuery  string = "INSERT INTO users (id, first_name, last_name, full_name, age, email) VALUES (?, ?, ?, ?, ?, ?)"
 )
 
 
@@ -114,7 +114,7 @@ type dbRepository struct {}
 
 
 func (repo *dbRepository) Create(user User) (*User, *RestErr) {
-	err := GetSession().Query(queryCreateUser, user.ID, user.FirstName, user.LastName, user.FullName, user.Age, user.EmailId).Exec()
+	err := GetSession().Query(CreateUserQuery, user.ID, user.FirstName, user.LastName, user.FullName, user.Age, user.EmailId).Exec()
 
 	if (err != nil) {
 		return nil, NewInternalServerError("Unable to insert user in db", errors.New(err.Error()))
@@ -127,7 +127,7 @@ func (repo *dbRepository) Create(user User) (*User, *RestErr) {
 func (repo *dbRepository) GetByID(userID string) (*User, *RestErr) {
 	var user User
 
-	err := GetSession().Query(queryGetUserById, userID).Scan(&user.ID, &user.FirstName, &user.LastName, &user.FullName, &user.Age, &user.EmailId)
+	err := GetSession().Query(GetUserByIdQuery, userID).Scan(&user.ID, &user.FirstName, &user.LastName, &user.FullName, &user.Age, &user.EmailId)
 	
 	if (err != nil) {
 		if (err.Error() == "Not found") {
