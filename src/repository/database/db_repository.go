@@ -8,9 +8,10 @@ import (
 	. "golang-gin-cassandra/src/utils/errors"
 )
 
+
 const (
-	queryGetUserById = "SELECT user_id, first_name, last_name, full_name, age, email FROM users WHERE user_id =?"
-	queryCreateUser  = "INSERT INTO users (user_id, first_name, last_name, full_name, age, email) VALUES (?, ?, ?, ?, ?, ?)"
+	queryGetUserById string = "SELECT user_id, first_name, last_name, full_name, age, email FROM users WHERE user_id = ?"
+	queryCreateUser  string = "INSERT INTO users (user_id, first_name, last_name, full_name, age, email) VALUES (?, ?, ?, ?, ?, ?)"
 )
 
 
@@ -24,29 +25,35 @@ type DbRepository interface {
 	Create(user model.User) (*model.User, *RestErr)
 }
 
-type dbRepository struct {
 
-}
+type dbRepository struct {}
+
 
 func (repo *dbRepository) Create(user model.User) (*model.User, *RestErr) {
-
-	if err := cassandra.GetSession().Query(queryCreateUser,
-		user.ID, user.FirstName, user.LastName, user.FullName, user.Age, user.EmailId).Exec(); err != nil {
-		return nil, NewInternalServerError("unable to insert user in db", errors.New(err.Error()))
+	err := cassandra.GetSession().Query(queryCreateUser, user.ID, user.FirstName, user.LastName, user.FullName, user.Age, user.EmailId).Exec()
+	
+	if (err != nil) {
+		return nil, NewInternalServerError("Unable to insert user in db", errors.New(err.Error()))
 	}
+	
 	return &user, nil
 }
 
-func (repo *dbRepository) GetByID(userID string) (*model.User, *RestErr) {
 
+func (repo *dbRepository) GetByID(userID string) (*model.User, *RestErr) {
 	var user model.User
-	if err := cassandra.GetSession().Query(queryGetUserById, userID).Scan(
-		&user.ID, &user.FirstName, &user.LastName, &user.FullName, &user.Age, &user.EmailId); err != nil {
-		if err.Error() == "not found" {
+
+	err := cassandra.GetSession().Query(queryGetUserById, userID).Scan(&user.ID, &user.FirstName, &user.LastName, &user.FullName, &user.Age, &user.EmailId);
+	
+	if (err != nil) {
+		if (err.Error() == "Not found") {
 			fmt.Println("here")
-			return nil, NewInternalServerError("no user for given user id", errors.New(err.Error()))
+			
+			return nil, NewInternalServerError("No user for given user id", errors.New(err.Error()))
 		}
-		return nil, NewInternalServerError("unable to find user in db", errors.New(err.Error()))
+		
+		return nil, NewInternalServerError("Unable to find user in db", errors.New(err.Error()))
 	}
+	
 	return &user, nil
 }
