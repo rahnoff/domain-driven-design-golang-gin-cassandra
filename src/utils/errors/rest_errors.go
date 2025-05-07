@@ -7,13 +7,6 @@ import (
 )
 
 
-/*type RestErr interface {
-	Message() string
-	Status() int
-	Error() string
-	Causes() []interface{}
-}*/
-
 type RestErr struct {
 	ErrMessage string        `json:"message"`
 	ErrStatus  int           `json:"status"`
@@ -21,36 +14,22 @@ type RestErr struct {
 	ErrCauses  []interface{} `json:"causes"`
 }
 
-/*func (e restErr) Error() string {
-	return fmt.Sprintf("message: %s - status: %d - error: %s - causes: %v",
-		e.ErrMessage, e.ErrStatus, e.ErrError, e.ErrCauses)
-}
-
-func (e restErr) Message() string {
-	return e.ErrMessage
-}
-
-func (e restErr) Status() int {
-	return e.ErrStatus
-}
-
-func (e restErr) Causes() []interface{} {
-	return e.ErrCauses
-}*/
 
 func NewRestError(message string, status int, err string, causes []interface{}) *RestErr {
 	return &RestErr{
 		ErrMessage: message,
 		ErrStatus:  status,
 		ErrError:   err,
-		ErrCauses:  causes,
+		ErrCauses:  causes
 	}
 }
 
+
 func NewRestErrorFromBytes(bytes []byte) (*RestErr, error) {
 	var apiErr RestErr
-	if err := json.Unmarshal(bytes, &apiErr); err != nil {
-		return nil, errors.New("invalid json")
+	err := json.Unmarshal(bytes, &apiErr)
+	if (err != nil) {
+		return nil, errors.New("Invalid json")
 	}
 	return &apiErr, nil
 }
@@ -59,15 +38,16 @@ func NewBadRequestError(message string) *RestErr {
 	return &RestErr{
 		ErrMessage: message,
 		ErrStatus:  http.StatusBadRequest,
-		ErrError:   "bad_request",
+		ErrError:   "bad_request"
 	}
 }
+
 
 func NewNotFoundError(message string) *RestErr {
 	return &RestErr{
 		ErrMessage: message,
 		ErrStatus:  http.StatusNotFound,
-		ErrError:   "not_found",
+		ErrError:   "not_found"
 	}
 }
 
@@ -75,19 +55,21 @@ func NewUnauthorizedError(message string) *RestErr {
 	return &RestErr{
 		ErrMessage: message,
 		ErrStatus:  http.StatusUnauthorized,
-		ErrError:   "unauthorized",
+		ErrError:   "unauthorized"
 	}
 }
+
 
 func NewInternalServerError(message string, err error) *RestErr {
 	result := &RestErr{
 		ErrMessage: message,
 		ErrStatus:  http.StatusInternalServerError,
-		ErrError:   "internal_server_error",
+		ErrError:   "internal_server_error"
 	}
-	if err != nil {
+	
+	if (err != nil) {
 		result.ErrCauses = append(result.ErrCauses, err.Error())
 	}
+	
 	return result
 }
-
