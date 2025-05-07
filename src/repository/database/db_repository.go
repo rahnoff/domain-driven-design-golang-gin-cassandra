@@ -43,11 +43,11 @@ func (repo *dbRepository) Create(user model.User) (*model.User, *RestErr) {
 func (repo *dbRepository) GetByID(userID string) (*model.User, *RestErr) {
 	var user model.User
 
-	err := cassandra.GetSession().Query(queryGetUserById, userID).Scan(&user.ID, &user.FirstName, &user.LastName, &user.FullName, &user.Age, &user.EmailId);
+	err := cassandra.GetSession().Query(queryGetUserById, userID).Scan(&user.ID, &user.FirstName, &user.LastName, &user.FullName, &user.Age, &user.EmailId)
 	
 	if (err != nil) {
 		if (err.Error() == "Not found") {
-			fmt.Println("here")
+			fmt.Println("Here")
 			
 			return nil, NewInternalServerError("No user for given user id", errors.New(err.Error()))
 		}
