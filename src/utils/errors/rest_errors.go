@@ -27,10 +27,13 @@ func NewRestError(message string, status int, err string, causes []interface{}) 
 
 func NewRestErrorFromBytes(bytes []byte) (*RestErr, error) {
 	var apiErr RestErr
+	
 	err := json.Unmarshal(bytes, &apiErr)
+	
 	if (err != nil) {
 		return nil, errors.New("Invalid json")
 	}
+	
 	return &apiErr, nil
 }
 
