@@ -93,8 +93,8 @@ func NewInternalServerError(message string, err error) *RestErr {
 
 
 const (
-	GetUserByIdQuery string = "SELECT id, first_name, last_name, full_name, age, email FROM users WHERE id = ?"
-	CreateUserQuery  string = "INSERT INTO users (id, first_name, last_name, full_name, age, email) VALUES (?, ?, ?, ?, ?, ?)"
+	queryGetUserById string = "SELECT id, first_name, last_name, full_name, age, email FROM users WHERE id = ?"
+	queryCreateUser  string = "INSERT INTO users (id, first_name, last_name, full_name, age, email) VALUES (?, ?, ?, ?, ?, ?)"
 )
 
 
@@ -317,10 +317,10 @@ func (userHandler *userHandler) Create(ctx *gin.Context)  {
 		ctx.JSON(restErr.ErrStatus, restErr)
 	}
 
-	_, err := userHandler.userService.Create(user)
+	_, userErr := userHandler.userService.Create(user)
 
-	if (err != nil) {
-		ctx.JSON(err.ErrStatus, err)
+	if (userErr != nil) {
+		ctx.JSON(userErr.ErrStatus, userErr)
 
 		return
 	}
